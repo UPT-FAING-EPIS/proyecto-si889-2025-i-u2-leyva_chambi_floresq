@@ -1,9 +1,7 @@
 name: Semgrep Analysis
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   semgrep-analysis:
