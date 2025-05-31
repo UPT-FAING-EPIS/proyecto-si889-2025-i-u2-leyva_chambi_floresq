@@ -3,7 +3,6 @@ Doc2Markdown/infra/.terraform/
 
 # Ignorar archivos de estado de Terraform y variables sensibles
 Doc2Markdown/infra/terraform.tfstate
-Doc2Markdown/infra/terraform.tfstate.backup
 Doc2Markdown/infra/terraform.tfvars
 Doc2Markdown/infra/*.tfvars
 *.auto.tfvars.json
