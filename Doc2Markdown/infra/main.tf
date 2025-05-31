@@ -55,29 +55,26 @@ resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
   end_ip_address   = "255.255.255.255"
 }
 
-# Plan de App Service
-resource "azurerm_app_service_plan" "app_plan_proyecto_patrones" {
+# Plan de App service
+resource "azurerm_service_plan" "app_plan_proyecto_patrones" {
   name                = "app-plan-proyecto-patrones"
   location            = azurerm_resource_group.rg_proyecto_patrones.location
   resource_group_name = azurerm_resource_group.rg_proyecto_patrones.name
-  kind                = "Linux"
-  reserved            = true
-
-  sku {
-    tier = "Basic"
-    size = "B1"
-  }
+  os_type             = "Linux"
+  sku_name            = "B1"
 }
 
-# Aplicación Web para FastAPI
+# Aplicación Web para FastAPI 
 resource "azurerm_linux_web_app" "webapp_proyecto_patrones" {
   name                = "webapp-proyecto-patrones"
   location            = azurerm_resource_group.rg_proyecto_patrones.location
   resource_group_name = azurerm_resource_group.rg_proyecto_patrones.name
-  service_plan_id     = azurerm_app_service_plan.app_plan_proyecto_patrones.id
+  service_plan_id     = azurerm_service_plan.app_plan_proyecto_patrones.id
 
   site_config {
-    linux_fx_version = "PYTHON|3.10"
+    application_stack {
+      python_version = "3.10"
+    }
   }
 
   app_settings = {
