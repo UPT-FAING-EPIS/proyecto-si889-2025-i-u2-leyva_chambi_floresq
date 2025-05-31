@@ -1,6 +1,0 @@
-subscription_id   = "719408f0-ec64-4930-a863-a4003a850e2f"
-client_id         = "40430e6e-1533-4a78-8555-76346887b777"
-client_secret     = "cv08Q~tRMT3eWA1ey4inQMs2rsPCAX8ETyVcVct-"
-tenant_id         = "b6b466ee-468d-4011-b9fc-fbdcf82ac90a"
-sqladmin_username = "sqladminuser"
-sqladmin_password = "Kxj0mchx@"
