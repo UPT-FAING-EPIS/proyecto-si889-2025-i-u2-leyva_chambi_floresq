@@ -28,7 +28,7 @@ python run.py
 
 Estructura
 
-/Doc2Markdown
+/app.zip
 ├── /app                        # Contiene la aplicación principal
 │   ├── /controllers            # Controladores: Lógica de la aplicación
 │   │   ├── document_controller.py
@@ -60,18 +60,12 @@ Estructura
 │   ├── /unit_tests             # Pruebas unitarias
 │   │   ├── test_document.py
 │   │   └── test_user.py
-│   └── /integration_tests      # Pruebas de integración
-│       ├── test_document_integration.py
-│       └── test_user_integration.py
-├── /migrations                 # Migraciones de base de datos (si usas una herramienta como Flask-Migrate)
-│   └── versions
 ├── /infra                  # Archivos Terraform para infraestructura
 │   ├── main.tf                 # Definición de la infraestructura (servidores, DB, etc.)
 │   ├── variables.tf            # Variables de configuración de Terraform
 │   ├── terraform.tfvars        # Valores específicos de entorno (como credenciales)
 │   └── outputs.tf              # Salidas de la infraestructura
 ├── /requirements.txt           # Dependencias del proyecto
-├── /Dockerfile                 # Para contenerizar la aplicación (si es necesario)
 ├── /README.md                  # Documentación básica del proyecto
 ├── /uploads 
 └── /run.py                     # Script para ejecutar el servidor de desarrollo
