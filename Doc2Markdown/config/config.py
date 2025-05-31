@@ -6,10 +6,10 @@ load_dotenv()
 
 class Config:
     # Configuración de Azure SQL
-    SQL_SERVER = os.getenv('SQL_SERVER', 'newsqlserverdoc2markdownjknew.database.windows.net')
-    SQL_DATABASE = os.getenv('SQL_DATABASE', 'newdbdoc2markdownjknew')
-    SQL_USERNAME = os.getenv('SQL_USERNAME', 'miservidorsql25')
-    SQL_PASSWORD = os.getenv('SQL_PASSWORD', 'JaimeUpt2025')
+    SQL_SERVER = os.getenv('SQL_SERVER', 'server-proyecto-patrones.database.windows.net')
+    SQL_DATABASE = os.getenv('SQL_DATABASE', 'DocMark')
+    SQL_USERNAME = os.getenv('SQL_USERNAME', 'sqladminuser')
+    SQL_PASSWORD = os.getenv('SQL_PASSWORD', 'Kxj0mchx@')
     SQL_DRIVER = os.getenv('SQL_DRIVER', 'ODBC Driver 17 for SQL Server')
     
     # Cadena de conexión - Formato corregido
