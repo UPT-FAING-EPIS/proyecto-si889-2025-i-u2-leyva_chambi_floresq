@@ -22,9 +22,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Grant execute permissions to startup.sh
-      run: chmod +x ./Doc2Markdown/startup.sh
-
     - name: Deploy to Azure Web App via publish profile
       uses: azure/webapps-deploy@v2
       with:
