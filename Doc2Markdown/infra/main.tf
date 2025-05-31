@@ -1,5 +1,15 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 4.0.0"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
+
   subscription_id = var.subscription_id
   client_id       = var.client_id
   client_secret   = var.client_secret
@@ -7,15 +17,16 @@ provider "azurerm" {
 }
 
 # Grupo de recursos
-resource "azurerm_resource_group" "doc2markdown_rg_jknew" {
-  name     = "rgdoc2markdownjknew"
+resource "azurerm_resource_group" "rg_proyecto_patrones" {
+  name     = "rg-proyecto-patrones"
   location = "East US 2"
 }
 
-resource "azurerm_mssql_server" "doc2markdown_sql_server_jknew" {
-  name                         = "newsqlserverdoc2markdownjknew"
-  resource_group_name          = azurerm_resource_group.doc2markdown_rg_jknew.name
-  location                     = "East US 2"
+# Servidor SQL
+resource "azurerm_mssql_server" "server_proyecto_patrones" {
+  name                         = "server-proyecto-patrones"
+  resource_group_name          = azurerm_resource_group.rg_proyecto_patrones.name
+  location                     = azurerm_resource_group.rg_proyecto_patrones.location
   version                      = "12.0"
   administrator_login          = var.sqladmin_username
   administrator_login_password = var.sqladmin_password
@@ -25,9 +36,10 @@ resource "azurerm_mssql_server" "doc2markdown_sql_server_jknew" {
   }
 }
 
-resource "azurerm_mssql_database" "doc2markdown_db_jknew" {
-  name                        = "newdbdoc2markdownjknew"
-  server_id                   = azurerm_mssql_server.doc2markdown_sql_server_jknew.id
+# Base de datos única: DocMark
+resource "azurerm_mssql_database" "db_docmark" {
+  name                        = "DocMark"
+  server_id                   = azurerm_mssql_server.server_proyecto_patrones.id
   sku_name                    = "GP_S_Gen5_2"
   collation                   = "SQL_Latin1_General_CP1_CI_AS"
   auto_pause_delay_in_minutes = 60
@@ -35,42 +47,42 @@ resource "azurerm_mssql_database" "doc2markdown_db_jknew" {
   storage_account_type        = "Local"
 }
 
-resource "azurerm_mssql_firewall_rule" "allow_azure_services_jknew" {
-  name             = "AllowAzureServicesjknew"
-  server_id        = azurerm_mssql_server.doc2markdown_sql_server_jknew.id
+# Regla de firewall para permitir acceso desde Azure
+resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
+  name             = "AllowAzureServices"
+  server_id        = azurerm_mssql_server.server_proyecto_patrones.id
   start_ip_address = "0.0.0.0"
-  end_ip_address   = "0.0.0.0"
+  end_ip_address   = "255.255.255.255"
 }
 
-resource "azurerm_service_plan" "doc2markdown_app_service_plan_jknew" {
-  name                = "newdoc2markdownappserviceplanjknew"
-  location            = "East US 2"
-  resource_group_name = azurerm_resource_group.doc2markdown_rg_jknew.name
-  sku_name            = "B1"
-  os_type             = "Linux"
-}
+# Plan de App Service
+resource "azurerm_app_service_plan" "app_plan_proyecto_patrones" {
+  name                = "app-plan-proyecto-patrones"
+  location            = azurerm_resource_group.rg_proyecto_patrones.location
+  resource_group_name = azurerm_resource_group.rg_proyecto_patrones.name
+  kind                = "Linux"
+  reserved            = true
 
-resource "azurerm_app_service" "doc2markdown_app_service_jknew" {
-  name                = "newdoc2markdownwebappjknew"
-  location            = azurerm_resource_group.doc2markdown_rg_jknew.location
-  resource_group_name = azurerm_resource_group.doc2markdown_rg_jknew.name
-  app_service_plan_id = azurerm_service_plan.doc2markdown_app_service_plan_jknew.id
-
-  app_settings = {
-    "SQL_SERVER"     = azurerm_mssql_server.doc2markdown_sql_server_jknew.name
-    "SQL_DATABASE"   = azurerm_mssql_database.doc2markdown_db_jknew.name
-    "SQL_USERNAME"   = var.sqladmin_username
-    "SQL_PASSWORD"   = var.sqladmin_password
-    "SECRET_KEY"     = var.secret_key
+  sku {
+    tier = "Basic"
+    size = "B1"
   }
+}
+
+# Aplicación Web para FastAPI
+resource "azurerm_linux_web_app" "webapp_proyecto_patrones" {
+  name                = "webapp-proyecto-patrones"
+  location            = azurerm_resource_group.rg_proyecto_patrones.location
+  resource_group_name = azurerm_resource_group.rg_proyecto_patrones.name
+  service_plan_id     = azurerm_app_service_plan.app_plan_proyecto_patrones.id
 
   site_config {
-    linux_fx_version = "PYTHON|3.8"
+    linux_fx_version = "PYTHON|3.10"
   }
 
-  connection_string {
-    name  = "db_connection_string"
-    value = "Server=tcp:${azurerm_mssql_server.doc2markdown_sql_server_jknew.name}.database.windows.net,1433;Database=${azurerm_mssql_database.doc2markdown_db_jknew.name};User ID=${var.sqladmin_username};Password=${var.sqladmin_password};Encrypt=true;TrustServerCertificate=false;"
-    type  = "SQLAzure"
+  app_settings = {
+    "WEBSITES_ENABLE_APP_SERVICE_STORAGE" = "false"
+    "SCM_DO_BUILD_DURING_DEPLOYMENT"      = "true"
+    "WEBSITE_RUN_FROM_PACKAGE"            = "1"
   }
 }

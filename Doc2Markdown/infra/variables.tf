@@ -28,8 +28,3 @@ variable "sqladmin_password" {
   type        = string
   sensitive   = true
 }
-variable "secret_key" {
-  description = "A secret key used in your application"
-  type        = string
-  sensitive   = true
-}
