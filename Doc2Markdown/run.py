@@ -1,15 +1,13 @@
-# run.py
-import os
-import subprocess
+# CONFIGURACION LOCAL
+import uvicorn
+from app.app import app
 
-if __name__ == "__main__":
-    port = os.environ.get("PORT", "8000")
-    cmd = [
-        "gunicorn", 
-        "-w", "4", 
-        "-k", "uvicorn.workers.UvicornWorker",
+if _name_ == "_main_":
+    uvicorn.run(
         "app.app:app",
-        "--bind", f"0.0.0.0:{port}",
-        "--timeout", "600"
-    ]
-    subprocess.run(cmd)
+        host="127.0.0.1",
+        port=8000,
+        reload=True
+        #ssl_keyfile="./key.pem",
+        #ssl_certfile="./cert.pem"
+    )
