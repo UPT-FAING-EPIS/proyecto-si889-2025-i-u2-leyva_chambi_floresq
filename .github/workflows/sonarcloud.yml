@@ -38,9 +38,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gnupg2 unixodbc-dev
 
-          # Configurar repositorio Microsoft
-          curl https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor > microsoft.gpg
-          sudo install -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/
+          # Eliminar las claves conflictivas
+          sudo rm /usr/share/keyrings/microsoft-prod.gpg
+          sudo rm /usr/share/keyrings/microsoft.gpg
+
+          # Configurar repositorio Microsoft con la clave correcta
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /usr/share/keyrings/microsoft.gpg > /dev/null
           sudo sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/ubuntu/$(lsb_release -rs)/prod $(lsb_release -cs) main" > /etc/apt/sources.list.d/microsoft.list'
 
           # Instalar driver y herramientas
