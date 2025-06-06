@@ -1,7 +1,9 @@
 name: SonarCloud Analysis
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - chite
 
 jobs:
   sonarcloud-analysis:
