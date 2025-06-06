@@ -31,21 +31,21 @@ jobs:
           pip install -r Doc2Markdown/requirements.txt
           pip install pytest pytest-cov sqlalchemy pyodbc
 
-      # Paso 4: Instalar y configurar ODBC Driver 17 (Paso dedicado a ODBC)
+      # Paso 4: Instalar y configurar ODBC Driver 17 (PASO CORREGIDO)
       - name: Install and Configure ODBC Driver 17
         run: |
           # Instalar dependencias del sistema
           sudo apt-get update
-          sudo apt-get install -y gnupg2 unixodbc-dev
+          sudo apt-get install -y gnupg2 unixodbc-dev curl
 
-          # Eliminar las claves antiguas si existen
+          # Eliminar claves antiguas conflictivas
           sudo rm -f /usr/share/keyrings/microsoft-prod.gpg
           sudo rm -f /usr/share/keyrings/microsoft.gpg
 
           # Descargar y agregar la clave pública de Microsoft
           curl https://packages.microsoft.com/keys/microsoft.asc | sudo tee /usr/share/keyrings/microsoft.gpg > /dev/null
 
-          # Configurar el repositorio de Microsoft
+          # Agregar repositorio de Microsoft con la clave correcta
           sudo sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/ubuntu/$(lsb_release -rs)/prod $(lsb_release -cs) main" > /etc/apt/sources.list.d/microsoft.list'
 
           # Instalar el driver ODBC y herramientas de SQL Server
@@ -56,7 +56,7 @@ jobs:
           echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> $GITHUB_ENV
           echo 'export ODBCSYSINI=/etc' >> $GITHUB_ENV
 
-          # Verificar la instalación del driver ODBC
+          # Verificar instalación del driver ODBC
           odbcinst -q -d -n "ODBC Driver 17 for SQL Server"
 
       # Paso 5: Configurar Java
@@ -84,7 +84,7 @@ jobs:
             --cov-report=xml:report_coverage/coverage.xml \
             --cov-report=term
 
-      # Paso 8: Análisis SonarCloud (VERSIÓN CORREGIDA)
+      # Paso 8: Análisis SonarCloud
       - name: SonarCloud Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
