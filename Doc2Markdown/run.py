@@ -9,7 +9,7 @@
 #    reload=False  # Deshabilitar recarga en producción
 #)
     
-# CONFIGURACION LOCAL ACTUALIZADA
+# CONFIGURACION LOCAL ACTUALIZADA 2
 import uvicorn
 from app.app import app
 
