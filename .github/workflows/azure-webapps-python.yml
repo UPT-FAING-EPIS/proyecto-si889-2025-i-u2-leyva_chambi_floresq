@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout código
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  
 
       - name: Configurar Git
         run: |
@@ -20,7 +22,7 @@ jobs:
 
       - name: Hacer push a Azure con autenticación embebida
         env:
-          AZURE_USERNAME: $webapp-proyecto-patrones
+          AZURE_USERNAME: webapp-proyecto-patrones
           AZURE_PASSWORD: gNbfkGxawf4fh0sopa0uA9qLPk9odmn1SXSLAqr3n3ezueDNauoGslvxvd14
         run: |
           REMOTE_URL="https://${AZURE_USERNAME}:${AZURE_PASSWORD}@webapp-proyecto-patrones.scm.azurewebsites.net/webapp-proyecto-patrones.git"
