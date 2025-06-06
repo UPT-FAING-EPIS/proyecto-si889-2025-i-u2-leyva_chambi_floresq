@@ -1,4 +1,4 @@
-name: Deploy FastAPI to Azure Web App
+name: Auto Deploy to Azure
 
 on:
   push:
@@ -10,23 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Descargar el código
+        uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.13'
+      - name: Configurar Git
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
 
-    - name: Install dependencies
-      working-directory: ./Doc2Markdown
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Hacer commit automáticamente
+        run: |
+          git add .
+          git commit -m "Auto commit" || echo "Nada para commitear"
 
-    - name: Deploy to Azure Web App via publish profile
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: webapp-proyecto-patrones
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: ./Doc2Markdown
+      - name: Subir cambios a Azure
+        run: git push "${{ secrets.AZURE_DEPLOY_CREDENTIALS }}" HEAD:master
