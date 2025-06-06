@@ -3,7 +3,7 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - chite  # Asegúrate de que coincide con tu rama
+      - chite
 
 jobs:
   sonarcloud-analysis:
@@ -16,27 +16,52 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Necesario para SonarCloud
+          fetch-depth: 0
 
-      # Paso 2: Configurar entorno ODBC
-      - name: Set up ODBC Driver 17
+      # Paso 2: Configurar Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # Paso 3: Instalar dependencias
+      - name: Install dependencies
         run: |
+          pip install --upgrade pip
+          pip install -r Doc2Markdown/requirements.txt
+          pip install pytest pytest-cov sqlalchemy pyodbc
+
+      # Paso 4: Configurar ODBC Driver 17 (NUEVO PASO COMPLETO)
+      - name: Install and Configure ODBC Driver
+        run: |
+          # Instalar dependencias del sistema
           sudo apt-get update
+          sudo apt-get install -y gnupg2 unixodbc-dev
+          
+          # Configurar repositorio Microsoft
           curl https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor > microsoft.gpg
           sudo install -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/
           sudo sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/ubuntu/$(lsb_release -rs)/prod $(lsb_release -cs) main" > /etc/apt/sources.list.d/microsoft.list'
+          
+          # Instalar driver y herramientas
           sudo apt-get update
-          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17 mssql-tools unixodbc-dev
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17 mssql-tools
+          
+          # Configurar variables de entorno
           echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> $GITHUB_ENV
+          echo 'export ODBCSYSINI=/etc' >> $GITHUB_ENV
+          
+          # Verificar instalación
+          odbcinst -q -d -n "ODBC Driver 17 for SQL Server"
 
-      # Paso 3: Instalar Java (requerido por SonarScanner)
+      # Paso 5: Configurar Java
       - name: Set up Java 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
-      # Paso 4: Instalar SonarScanner
+      # Paso 6: Instalar SonarScanner
       - name: Install SonarScanner
         run: |
           SONAR_SCANNER_VERSION="5.0.1.3006"
@@ -45,20 +70,7 @@ jobs:
           sudo mv sonar-scanner-${SONAR_SCANNER_VERSION}-linux /opt/sonar-scanner
           echo "$(/opt/sonar-scanner/bin/sonar-scanner --version)"
 
-      # Paso 5: Configurar Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'  # Ajusta a tu versión
-
-      # Paso 6: Instalar dependencias
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r Doc2Markdown/requirements.txt
-          pip install pytest pytest-cov sqlalchemy pyodbc
-
-      # Paso 7: Ejecutar pruebas y generar cobertura
+      # Paso 7: Ejecutar pruebas
       - name: Run tests with coverage
         run: |
           cd Doc2Markdown
@@ -67,7 +79,7 @@ jobs:
             --cov-report=xml:report_coverage/coverage.xml \
             --cov-report=term
 
-      # Paso 8: Ejecutar análisis SonarCloud
+      # Paso 8: Análisis SonarCloud (VERSIÓN CORREGIDA)
       - name: SonarCloud Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
