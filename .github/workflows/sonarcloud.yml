@@ -3,7 +3,7 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - chite
+      - chite  # Asegúrate de que la rama correcta esté especificada
 
 jobs:
   sonarcloud-analysis:
@@ -31,26 +31,26 @@ jobs:
           pip install -r Doc2Markdown/requirements.txt
           pip install pytest pytest-cov sqlalchemy pyodbc
 
-      # Paso 4: Configurar ODBC Driver 17 (NUEVO PASO COMPLETO)
-      - name: Install and Configure ODBC Driver
+      # Paso 4: Instalar y configurar ODBC Driver 17 (Paso dedicado a ODBC)
+      - name: Install and Configure ODBC Driver 17
         run: |
           # Instalar dependencias del sistema
           sudo apt-get update
           sudo apt-get install -y gnupg2 unixodbc-dev
-          
+
           # Configurar repositorio Microsoft
           curl https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor > microsoft.gpg
           sudo install -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/
           sudo sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/ubuntu/$(lsb_release -rs)/prod $(lsb_release -cs) main" > /etc/apt/sources.list.d/microsoft.list'
-          
+
           # Instalar driver y herramientas
           sudo apt-get update
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17 mssql-tools
-          
+
           # Configurar variables de entorno
           echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> $GITHUB_ENV
           echo 'export ODBCSYSINI=/etc' >> $GITHUB_ENV
-          
+
           # Verificar instalación
           odbcinst -q -d -n "ODBC Driver 17 for SQL Server"
 
