@@ -42,7 +42,7 @@ jobs:
 
       - name: Run tests and generate coverage report
         run: |
-          pytest tests/unit_tests --cov=app --cov-report=xml:report_coverage/coverage.xml  # Ruta correcta para los tests
+          pytest --cov=app --cov-report=xml:report_coverage/coverage.xml  # Genera el informe de cobertura en formato XML
 
       # Run SonarCloud Analysis 
       - name: Run SonarCloud Analysis 
