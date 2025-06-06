@@ -1,4 +1,4 @@
-name: Auto Deploy to Azure
+name: Deploy to Azure Web App
 
 on:
   push:
@@ -10,18 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Descargar el código
+      - name: Checkout código
         uses: actions/checkout@v3
 
       - name: Configurar Git
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          git config --global user.email "github-actions@bot.com"
+          git config --global user.name "GitHub Actions"
 
-      - name: Hacer commit automáticamente
+      - name: Añadir remoto Azure y hacer push
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
         run: |
-          git add .
-          git commit -m "Auto commit" || echo "Nada para commitear"
-
-      - name: Subir cambios a Azure
-        run: git push "${{ secrets.AZURE_DEPLOY_CREDENTIALS }}" HEAD:master
+          URL="https://${AZURE_CREDENTIALS}@webapp-proyecto-patrones.scm.azurewebsites.net/webapp-proyecto-patrones.git"
+          git remote add azure "$URL"
+          git push azure main:master
