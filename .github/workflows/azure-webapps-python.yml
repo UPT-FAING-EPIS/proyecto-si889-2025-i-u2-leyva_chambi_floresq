@@ -21,8 +21,8 @@ jobs:
       - name: Hacer push a Azure con autenticación embebida
         env:
           AZURE_USERNAME: jf2021070309
-          AZURE_PASSWORD: ${{ secrets.AZURE_DEPLOY_CREDENTIALS }}
+          AZURE_PASSWORD: gNbfkGxawf4fh0sopa0uA9qLPk9odmn1SXSLAqr3n3ezueDNauoGslvxvd14
         run: |
           REMOTE_URL="https://${AZURE_USERNAME}:${AZURE_PASSWORD}@webapp-proyecto-patrones.scm.azurewebsites.net/webapp-proyecto-patrones.git"
-          git remote set-url origin $REMOTE_URL
+          git remote set-url origin "$REMOTE_URL"
           git push origin main:master --force
