@@ -63,76 +63,83 @@ async function searchVersions(documentTitle, page) {
         }
         
         data.versions.forEach(version => {
-            const li = document.createElement("li");
-            li.className = "list-group-item d-flex justify-content-between align-items-center";
-            
-            // Contenedor para título, versión y fecha (izquierda)
-            const leftContent = document.createElement("div");
-            
-            // Enlace de descarga para el título
-            const downloadLink = document.createElement("a");
-            downloadLink.href = `/api/documents/download/${version.document_id}`;
-            downloadLink.target = "_blank";
-            downloadLink.style.textDecoration = "none";
-            downloadLink.style.color = "#0d6efd"; // Azul Bootstrap para enlaces
-            downloadLink.style.marginRight = "8px";
-            downloadLink.textContent = version.title;
-            
-            // Texto normal negro para la versión
-            const versionSpan = document.createElement("span");
-            versionSpan.style.color = "#000"; // Texto negro
-            versionSpan.style.marginRight = "8px";
-            versionSpan.textContent = `Versión ${version.version_number}`;
-            
-            // Fecha en gris
-            const dateSpan = document.createElement("small");
-            dateSpan.className = "text-muted";
-            dateSpan.textContent = new Date(version.created_at).toLocaleString();
-            
-            leftContent.appendChild(downloadLink);
-            leftContent.appendChild(versionSpan);
-            leftContent.appendChild(dateSpan);
-            
-            // Contenedor para botones (derecha)
-            const actionsContainer = document.createElement("div");
-            
-            // Botón de previsualizar
-            const previewBtn = document.createElement("a");
-            previewBtn.href = "#";
-            previewBtn.className = "text-primary me-3";
-            previewBtn.textContent = "Previsualizar";
-            previewBtn.onclick = (e) => {
-                e.preventDefault();
-                previewDocument(version.document_id);
-            };
-            
-            // Botón de eliminar
-            const deleteBtn = document.createElement("a");
-            deleteBtn.href = "#";
-            deleteBtn.className = "text-danger";
-            deleteBtn.textContent = "Eliminar";
-            deleteBtn.onclick = (e) => {
-                e.preventDefault();
-                deleteVersion(version.document_id, version.version_number);
-            };
-            
-            actionsContainer.appendChild(previewBtn);
-            actionsContainer.appendChild(deleteBtn);
-            
-            // Agregar elementos al li
-            li.appendChild(leftContent);
-            li.appendChild(actionsContainer);
-            
+            const li = createVersionItem(version);
             versionsList.appendChild(li);
         });
         
-        // Mostrar u ocultar el botón "Ver más" según si hay más resultados
         loadMoreContainer.style.display = data.has_more ? "block" : "none";
         
     } catch (error) {
         console.error("Error:", error);
         alert("Ocurrió un error: " + error.message);
     }
+}
+
+function createVersionItem(version) {
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+    
+    // Contenedor para título, versión y fecha (izquierda)
+    const leftContent = document.createElement("div");
+
+    // Enlace de descarga para el título
+    const downloadLink = createLink(`/api/documents/download/${version.document_id}`, version.title, "text-decoration-none text-primary");
+    
+    // Texto normal negro para la versión
+    const versionSpan = createTextSpan(`Versión ${version.version_number}`, "#000");
+    
+    // Fecha en gris
+    const dateSpan = createTextSpan(new Date(version.created_at).toLocaleString(), "text-muted", "small");
+    
+    leftContent.appendChild(downloadLink);
+    leftContent.appendChild(versionSpan);
+    leftContent.appendChild(dateSpan);
+    
+    // Contenedor para botones (derecha)
+    const actionsContainer = document.createElement("div");
+    
+    // Botón de previsualizar
+    const previewBtn = createActionBtn("Previsualizar", () => previewDocument(version.document_id), "text-primary me-3");
+    
+    // Botón de eliminar
+    const deleteBtn = createActionBtn("Eliminar", () => deleteVersion(version.document_id, version.version_number), "text-danger");
+    
+    actionsContainer.appendChild(previewBtn);
+    actionsContainer.appendChild(deleteBtn);
+    
+    li.appendChild(leftContent);
+    li.appendChild(actionsContainer);
+    
+    return li;
+}
+
+function createLink(href, text, classNames = "") {
+    const link = document.createElement("a");
+    link.href = href;
+    link.target = "_blank";
+    link.className = classNames;
+    link.textContent = text;
+    return link;
+}
+
+function createTextSpan(text, color, extraClass = "") {
+    const span = document.createElement(extraClass ? "small" : "span");
+    span.className = extraClass;
+    span.style.color = color;
+    span.textContent = text;
+    return span;
+}
+
+function createActionBtn(text, onClick, classNames) {
+    const btn = document.createElement("a");
+    btn.href = "#";
+    btn.className = classNames;
+    btn.textContent = text;
+    btn.onclick = (e) => {
+        e.preventDefault();
+        onClick();
+    };
+    return btn;
 }
 
 async function deleteVersion(documentId, versionNumber) {
@@ -164,7 +171,6 @@ async function deleteVersion(documentId, versionNumber) {
     }
 }
 
-// Nueva función para previsualizar documentos
 async function previewDocument(documentId) {
     try {
         const response = await fetch(`/api/documents/content/${documentId}`, {
@@ -181,18 +187,13 @@ async function previewDocument(documentId) {
         
         const data = await response.json();
         
-        // Obtener el modal
         const modal = document.getElementById('previewModal');
         const titleElement = document.getElementById('previewTitle');
         const contentElement = document.getElementById('previewContent');
         
-        // Actualizar contenido
         titleElement.textContent = `${data.title} (Versión ${data.version})`;
-        
-        // Convertir Markdown a HTML usando marked.js
         contentElement.innerHTML = marked.parse(data.markdown_content);
         
-        // Mostrar el modal
         modal.style.display = 'block';
         
     } catch (error) {
