@@ -18,13 +18,11 @@ jobs:
           git config --global user.email "github-actions@bot.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Autenticarse y hacer push a Azure
+      - name: Hacer push a Azure con autenticación embebida
         env:
           AZURE_USERNAME: jf2021070309
-          AZURE_PASSWORD: ${{ secrets.AZURE_PASSWORD }}
+          AZURE_PASSWORD: ${{ secrets.AZURE_DEPLOY_CREDENTIALS }}
         run: |
-          echo "echo $AZURE_PASSWORD" > git-askpass.sh
-          chmod +x git-askpass.sh
-          export GIT_ASKPASS=./git-askpass.sh
-          git remote set-url origin https://$AZURE_USERNAME@webapp-proyecto-patrones.scm.azurewebsites.net/webapp-proyecto-patrones.git
-          git push origin main:master
+          REMOTE_URL="https://${AZURE_USERNAME}:${AZURE_PASSWORD}@webapp-proyecto-patrones.scm.azurewebsites.net/webapp-proyecto-patrones.git"
+          git remote set-url origin $REMOTE_URL
+          git push origin main:master --force
