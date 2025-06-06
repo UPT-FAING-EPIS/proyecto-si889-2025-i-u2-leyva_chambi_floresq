@@ -37,12 +37,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r Doc2Markdown/requirements.txt  # Actualicé la ruta para que apunte a Doc2Markdown/requirements.txt
           pip install pytest pytest-cov  # Asegúrate de que pytest y pytest-cov estén instalados
 
       - name: Run tests and generate coverage report
         run: |
-          pytest --cov=app --cov-report=xml:report_coverage/coverage.xml  # Genera el informe de cobertura en formato XML
+          pytest tests/unit_tests --cov=app --cov-report=xml:report_coverage/coverage.xml  # Ruta correcta para los tests
 
       # Run SonarCloud Analysis 
       - name: Run SonarCloud Analysis 
