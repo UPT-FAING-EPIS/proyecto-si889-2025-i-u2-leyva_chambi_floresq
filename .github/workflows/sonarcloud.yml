@@ -24,14 +24,23 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential unixodbc-dev
 
-      # Paso 4: Agregar el repositorio de Microsoft e instalar ODBC Driver 17
+      # Paso 4: Instalar ODBC Driver 17 para SQL Server
       - name: Install ODBC Driver 17 for SQL Server
         run: |
+          # Descargar la clave pública de Microsoft
           curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-          sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/debian/$(lsb_release -rs)/prod stable main"
+
+          # Agregar el repositorio de Microsoft para Ubuntu 24.04
+          sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/ubuntu/24.04/prod stable main"
+          
+          # Actualizar la lista de paquetes
           sudo apt-get update
+          
+          # Instalar el controlador ODBC
           sudo apt-get install -y msodbcsql17
-          sudo apt-get install -y mssql-tools  # Herramientas adicionales (opcional)
+          
+          # Instalar mssql-tools (opcional, para herramientas adicionales)
+          sudo apt-get install -y mssql-tools
 
       # Paso 5: Instalar Java 17 (sonar-scanner lo requiere)
       - name: Install Java 17
