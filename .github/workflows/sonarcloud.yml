@@ -3,81 +3,82 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - chite  # Asegúrate de que la rama correcta esté especificada
+      - chite  # Asegúrate de que coincide con tu rama
 
 jobs:
   sonarcloud-analysis:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: ${{ github.workspace }}/Doc2Markdown
 
     steps:
-      # Paso 1: Descargar el código del repositorio
+      # Paso 1: Checkout del código
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Necesario para SonarCloud
 
-      # Paso 2: Establecer PYTHONPATH para que apunte al directorio correcto
-      - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=$(pwd)/Doc2Markdown" >> $GITHUB_ENV
-
-      # Paso 3: Instalar dependencias de compilación necesarias
-      - name: Install build dependencies
+      # Paso 2: Configurar entorno ODBC
+      - name: Set up ODBC Driver 17
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential unixodbc-dev
-
-      # Paso 4: Instalar ODBC Driver 17 para SQL Server
-      - name: Install ODBC Driver 17 for SQL Server
-        run: |
-          # Descargar la clave pública de Microsoft
-          curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-
-          # Agregar el repositorio de Microsoft para Ubuntu 24.04
-          sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/ubuntu/24.04/prod stable main"
-          
-          # Actualizar la lista de paquetes
+          curl https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor > microsoft.gpg
+          sudo install -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/
+          sudo sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/ubuntu/$(lsb_release -rs)/prod $(lsb_release -cs) main" > /etc/apt/sources.list.d/microsoft.list'
           sudo apt-get update
-          
-          # Instalar el controlador ODBC
-          sudo apt-get install -y msodbcsql17
-          
-          # Instalar mssql-tools (opcional, para herramientas adicionales)
-          sudo apt-get install -y mssql-tools
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql17 mssql-tools unixodbc-dev
+          echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> $GITHUB_ENV
 
-      # Paso 5: Instalar Java 17 (sonar-scanner lo requiere)
-      - name: Install Java 17
-        run: |
-          sudo apt update
-          sudo apt install -y openjdk-17-jdk
-          java -version
+      # Paso 3: Instalar Java (requerido por SonarScanner)
+      - name: Set up Java 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
 
-      # Paso 6: Instalar SonarScanner (para análisis con SonarCloud)
+      # Paso 4: Instalar SonarScanner
       - name: Install SonarScanner
         run: |
-          curl -L "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip" -o sonar-scanner-linux.zip
-          unzip sonar-scanner-linux.zip -d /opt
-          sudo ln -s /opt/sonar-scanner-6.2.1.4610-linux-x64/bin/sonar-scanner /usr/local/bin/sonar-scanner
-          sonar-scanner --version
+          SONAR_SCANNER_VERSION="5.0.1.3006"
+          wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip
+          unzip sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip
+          sudo mv sonar-scanner-${SONAR_SCANNER_VERSION}-linux /opt/sonar-scanner
+          echo "$(/opt/sonar-scanner/bin/sonar-scanner --version)"
 
-      # Paso 7: Instalar las dependencias desde el archivo requirements.txt dentro de Doc2Markdown
+      # Paso 5: Configurar Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'  # Ajusta a tu versión
+
+      # Paso 6: Instalar dependencias
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r Doc2Markdown/requirements.txt  # Instalar dependencias desde el archivo 'requirements.txt' dentro de 'Doc2Markdown'
-          pip install pytest pytest-cov  # Instalar pytest y pytest-cov para pruebas y generación de cobertura
+          pip install --upgrade pip
+          pip install -r Doc2Markdown/requirements.txt
+          pip install pytest pytest-cov sqlalchemy pyodbc
 
-      # Paso 8: Ejecutar las pruebas y generar el informe de cobertura
-      - name: Run tests and generate coverage report
+      # Paso 7: Ejecutar pruebas y generar cobertura
+      - name: Run tests with coverage
         run: |
-          pytest Doc2Markdown/tests/unit_tests --cov=Doc2Markdown/app --cov-report=xml:Doc2Markdown/report_coverage/coverage.xml  # Ejecutar pruebas y generar informe de cobertura en formato XML
+          cd Doc2Markdown
+          pytest tests/unit_tests \
+            --cov=app \
+            --cov-report=xml:report_coverage/coverage.xml \
+            --cov-report=term
 
-      # Paso 9: Ejecutar análisis de SonarCloud con el informe de cobertura generado
-      - name: Run SonarCloud Analysis 
+      # Paso 8: Ejecutar análisis SonarCloud
+      - name: SonarCloud Scan
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # SonarCloud Token
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          cd Doc2Markdown/app  # Ir al directorio correcto si es necesario
-          sonar-scanner \
+          /opt/sonar-scanner/bin/sonar-scanner \
             -Dsonar.projectKey=jaimeflores_doc2markdown \
             -Dsonar.organization=jaimeflores \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.python.coverage.reportPaths=Doc2Markdown/report_coverage/coverage.xml  # Ruta del archivo de cobertura generado por pytest
+            -Dsonar.sources=app \
+            -Dsonar.tests=tests \
+            -Dsonar.python.coverage.reportPaths=report_coverage/coverage.xml \
+            -Dsonar.language=py \
+            -Dsonar.python.version=3.10 \
+            -Dsonar.working.directory=${{ github.workspace }}/.scannerwork \
+            -Dsonar.scm.disabled=true
