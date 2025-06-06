@@ -10,23 +10,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Paso 1: Descargar el código del repositorio
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # Paso 2: Establecer PYTHONPATH para que apunte al directorio correcto
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$(pwd)/Doc2Markdown" >> $GITHUB_ENV
 
+      # Paso 3: Instalar dependencias de compilación necesarias
       - name: Install build dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential unixodbc-dev
 
+      # Paso 4: Instalar Java 17 (sonar-scanner lo requiere)
       - name: Install Java 17
         run: |
           sudo apt update
           sudo apt install -y openjdk-17-jdk
           java -version
 
+      # Paso 5: Instalar SonarScanner (para análisis con SonarCloud)
       - name: Install SonarScanner
         run: |
           curl -L "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip" -o sonar-scanner-linux.zip
@@ -34,25 +39,27 @@ jobs:
           sudo ln -s /opt/sonar-scanner-6.2.1.4610-linux-x64/bin/sonar-scanner /usr/local/bin/sonar-scanner
           sonar-scanner --version
 
+      # Paso 6: Instalar las dependencias desde el archivo requirements.txt
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r Doc2Markdown/requirements.txt  # Actualicé la ruta para que apunte a Doc2Markdown/requirements.txt
-          pip install pytest pytest-cov  # Asegúrate de que pytest y pytest-cov estén instalados
+          pip install -r Doc2Markdown/requirements.txt  # Instalar dependencias desde el archivo 'requirements.txt' dentro de 'Doc2Markdown'
+          pip install pytest pytest-cov  # Instalar pytest y pytest-cov para pruebas y generación de cobertura
 
+      # Paso 7: Ejecutar las pruebas y generar el informe de cobertura
       - name: Run tests and generate coverage report
         run: |
-          pytest --cov=app --cov-report=xml:report_coverage/coverage.xml  # Genera el informe de cobertura en formato XML
+          pytest tests/unit_tests --cov=app --cov-report=xml:report_coverage/coverage.xml  # Ejecutar pruebas y generar informe de cobertura en formato XML
 
-      # Run SonarCloud Analysis 
+      # Paso 8: Ejecutar análisis de SonarCloud con el informe de cobertura generado
       - name: Run SonarCloud Analysis 
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}  # SonarCloud Token
         run: |
-          cd Doc2Markdown/app
+          cd Doc2Markdown/app  # Ir al directorio correcto si es necesario
           sonar-scanner \
             -Dsonar.projectKey=jaimeflores_doc2markdown \
             -Dsonar.organization=jaimeflores \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.python.coverage.reportPaths=report_coverage/coverage.xml  # Asegúrate de que la ruta del archivo de cobertura sea correcta
+            -Dsonar.python.coverage.reportPaths=report_coverage/coverage.xml  # Ruta del archivo de cobertura generado por pytest
