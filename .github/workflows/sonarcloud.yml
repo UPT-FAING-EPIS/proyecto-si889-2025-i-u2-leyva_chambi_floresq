@@ -38,7 +38,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gnupg2 unixodbc-dev
 
-          # Eliminar claves GPG antiguas si existen
+          # Eliminar las claves antiguas si existen
           sudo rm -f /usr/share/keyrings/microsoft-prod.gpg
           sudo rm -f /usr/share/keyrings/microsoft.gpg
 
