@@ -18,10 +18,13 @@ jobs:
           git config --global user.email "github-actions@bot.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Añadir remoto Azure y hacer push
+      - name: Autenticarse y hacer push a Azure
         env:
-          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+          AZURE_USERNAME: jf2021070309
+          AZURE_PASSWORD: ${{ secrets.AZURE_PASSWORD }}
         run: |
-          URL="https://${AZURE_CREDENTIALS}@webapp-proyecto-patrones.scm.azurewebsites.net/webapp-proyecto-patrones.git"
-          git remote add azure "$URL"
-          git push azure main:master
+          echo "echo $AZURE_PASSWORD" > git-askpass.sh
+          chmod +x git-askpass.sh
+          export GIT_ASKPASS=./git-askpass.sh
+          git remote set-url origin https://$AZURE_USERNAME@webapp-proyecto-patrones.scm.azurewebsites.net/webapp-proyecto-patrones.git
+          git push origin main:master
