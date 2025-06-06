@@ -3,7 +3,7 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - chite
+      - chite  # Asegúrate de que la rama correcta esté especificada
 
 jobs:
   sonarcloud-analysis:
@@ -34,6 +34,16 @@ jobs:
           sudo ln -s /opt/sonar-scanner-6.2.1.4610-linux-x64/bin/sonar-scanner /usr/local/bin/sonar-scanner
           sonar-scanner --version
 
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov  # Asegúrate de que pytest y pytest-cov estén instalados
+
+      - name: Run tests and generate coverage report
+        run: |
+          pytest --cov=app --cov-report=xml:report_coverage/coverage.xml  # Genera el informe de cobertura en formato XML
+
       # Run SonarCloud Analysis 
       - name: Run SonarCloud Analysis 
         env:
@@ -45,6 +55,4 @@ jobs:
             -Dsonar.organization=jaimeflores \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.python.coverage.reportPaths=report_coverage/coverage.xml \
-
- 
+            -Dsonar.python.coverage.reportPaths=report_coverage/coverage.xml  # Asegúrate de que la ruta del archivo de cobertura sea correcta
