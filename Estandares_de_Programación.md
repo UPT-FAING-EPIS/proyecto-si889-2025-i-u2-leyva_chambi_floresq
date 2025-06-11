@@ -17,6 +17,8 @@ Docente: Ing. Patrick Jose Cuadros Quiroga
 
 **Leyva Sardon, Elvis Ronald               (2021072614)** 
 
+**Chite Quispe, Brian Danilo               (2021070015)** 
+
 **Tacna – Perú** 
 
 **2024**
