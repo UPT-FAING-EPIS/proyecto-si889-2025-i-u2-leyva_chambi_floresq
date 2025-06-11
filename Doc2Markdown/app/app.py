@@ -10,6 +10,7 @@ from config.config import Config
 import os
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from app.controllers.similarity_controller import router as similarity_router
 
 # Crear tablas en la base de datos
 Base.metadata.create_all(bind=engine)
@@ -41,6 +42,7 @@ app.add_middleware(
 # Configurar rutas de API
 app.include_router(document_router, prefix="/api/documents", tags=["documents"])
 app.include_router(user_router, prefix="/api/users", tags=["users"])
+app.include_router(similarity_router, prefix="/api/similarity", tags=["similarity"])
 
 # Montar archivos estáticos (CSS, JS, imágenes, documentos)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")

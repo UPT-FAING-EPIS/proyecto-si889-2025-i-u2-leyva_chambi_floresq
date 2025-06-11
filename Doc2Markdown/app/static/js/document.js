@@ -94,10 +94,19 @@ async function fetchDocuments() {
                     improveBtn.onclick = () => {
                         improveDocument(doc.document_id);
                     };
+
+                    // Nuevo botón para analizar similitudes
+                    const analyzeBtn = document.createElement("button");
+                    analyzeBtn.className = "btn btn-sm btn-outline-warning mx-1";
+                    analyzeBtn.textContent = "Analizar Similitudes";
+                    analyzeBtn.onclick = () => {
+                        analyzeSimilarities(doc.document_id);
+                    };
                     
                     // Añadir botones al div de botones
                     buttonsDiv.appendChild(previewBtn);
                     buttonsDiv.appendChild(improveBtn);
+                    buttonsDiv.appendChild(analyzeBtn);
 
                     // Agregar ambos divs al li
                     li.appendChild(infoDiv);
@@ -226,4 +235,223 @@ async function previewDocument(documentId) {
         console.error("Error:", error);
         showAlert("Ocurrió un error: " + error.message, "danger");
     }
+}
+
+// Función para analizar similitudes
+async function analyzeSimilarities(documentId) {
+    try {
+        // Mostrar modal de información del documento
+        const response = await fetch(`/api/similarity/document-info/${documentId}`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("access_token")}`
+            }
+        });
+
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.detail || "Error al obtener información del documento");
+        }
+
+        const documentInfo = await response.json();
+        showSimilarityModal(documentInfo);
+
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Ocurrió un error: " + error.message);
+    }
+}
+
+// Función para mostrar el modal de similitudes
+function showSimilarityModal(documentInfo) {
+    // Crear modal dinámicamente
+    const modalHTML = `
+        <div id="similarityModal" class="modal" style="display: block; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+            <div class="modal-content" style="background-color: #fefefe; margin: 5% auto; padding: 0; border: 1px solid #888; width: 90%; max-width: 900px; border-radius: 8px;">
+                <div class="modal-header" style="padding: 20px; border-bottom: 1px solid #ddd; display: flex; justify-content: between; align-items: center;">
+                    <h4 style="margin: 0; color: #333;">📊 Análisis de Similitudes</h4>
+                    <button id="closeSimilarityModal" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #666;">&times;</button>
+                </div>
+                <div class="modal-body" style="padding: 20px;">
+                    <div class="document-info" style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <h5 style="color: #495057; margin-bottom: 15px;">📄 Información del Documento</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Título:</strong> ${documentInfo.title}</p>
+                                <p><strong>Autor:</strong> ${documentInfo.author}</p>
+                                <p><strong>Formato Original:</strong> ${documentInfo.original_format}</p>
+                                <p><strong>Versión:</strong> ${documentInfo.version || 'N/A'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Creado:</strong> ${documentInfo.created_at}</p>
+                                <p><strong>Actualizado:</strong> ${documentInfo.updated_at}</p>
+                                <p><strong>Palabras:</strong> ${documentInfo.statistics.word_count.toLocaleString()}</p>
+                                <p><strong>Caracteres:</strong> ${documentInfo.statistics.character_count.toLocaleString()}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 style="color: #495057; margin: 0;">🔍 Análisis de Similitudes</h5>
+                            <button id="startAnalysisBtn" class="btn btn-primary" onclick="startSimilarityAnalysis(${documentInfo.document_id})">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="display: none;"></span>
+                                Analizar Similitudes
+                            </button>
+                        </div>
+                        <div id="analysisResults" style="min-height: 200px;">
+                            <div class="text-center text-muted" style="padding: 60px 0;">
+                                <i class="fas fa-search" style="font-size: 48px; margin-bottom: 15px;"></i>
+                                <p>Haz clic en "Analizar Similitudes" para comenzar el análisis</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Agregar modal al DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Configurar eventos
+    document.getElementById('closeSimilarityModal').onclick = function() {
+        document.getElementById('similarityModal').remove();
+    };
+
+    // Cerrar al hacer clic fuera del contenido
+    document.getElementById('similarityModal').onclick = function(event) {
+        if (event.target.id === 'similarityModal') {
+            document.getElementById('similarityModal').remove();
+        }
+    };
+}
+
+// Función para iniciar el análisis de similitudes
+async function startSimilarityAnalysis(documentId) {
+    const btn = document.getElementById('startAnalysisBtn');
+    const spinner = btn.querySelector('.spinner-border');
+    const resultsDiv = document.getElementById('analysisResults');
+
+    try {
+        // Mostrar spinner y deshabilitar botón
+        spinner.style.display = 'inline-block';
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Analizando...';
+
+        // Mostrar mensaje de carga
+        resultsDiv.innerHTML = `
+            <div class="text-center">
+                <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p class="mt-3">Analizando similitudes con otros documentos...</p>
+                <p class="text-muted">Esto puede tardar unos momentos</p>
+            </div>
+        `;
+
+        // Realizar análisis
+        const response = await fetch(`/api/similarity/analyze-similarities/${documentId}`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("access_token")}`,
+                "Content-Type": "application/json"
+            }
+        });
+
+        // CAMBIO CRÍTICO: Verificar el tipo de contenido antes de parsear
+        const contentType = response.headers.get('content-type');
+        console.log('Response status:', response.status);
+        console.log('Content-Type:', contentType);
+
+        if (!response.ok) {
+            let errorMessage;
+            
+            // Si es JSON, parsear como JSON
+            if (contentType && contentType.includes('application/json')) {
+                const errorData = await response.json();
+                errorMessage = errorData.detail || "Error al analizar similitudes";
+            } else {
+                // Si no es JSON, leer como texto
+                const errorText = await response.text();
+                console.error('Error response (text):', errorText);
+                errorMessage = `Error del servidor: ${response.status}`;
+            }
+            
+            throw new Error(errorMessage);
+        }
+
+        // Verificar que la respuesta exitosa sea JSON
+        if (!contentType || !contentType.includes('application/json')) {
+            const text = await response.text();
+            console.error('Expected JSON but got:', text);
+            throw new Error('El servidor no devolvió una respuesta JSON válida');
+        }
+
+        const results = await response.json();
+        displaySimilarityResults(results);
+
+    } catch (error) {
+        console.error("Error completo:", error);
+        resultsDiv.innerHTML = `
+            <div class="alert alert-danger">
+                <h6>Error en el análisis</h6>
+                <p>${error.message}</p>
+                <small>Revisa la consola del navegador para más detalles</small>
+            </div>
+        `;
+    } finally {
+        // Restaurar botón
+        btn.disabled = false;
+        btn.innerHTML = 'Analizar Similitudes';
+    }
+}
+
+// Función para mostrar los resultados del análisis
+function displaySimilarityResults(results) {
+    const resultsDiv = document.getElementById('analysisResults');
+
+    if (results.comparisons.length === 0) {
+        resultsDiv.innerHTML = `
+            <div class="alert alert-info">
+                <h6>Sin comparaciones disponibles</h6>
+                <p>${results.message || 'No se encontraron otros documentos para comparar'}</p>
+            </div>
+        `;
+        return;
+    }
+
+    let html = `
+        <div class="results-summary mb-3">
+            <div class="alert alert-info">
+                <strong>📊 Resumen del Análisis:</strong> Se comparó con ${results.total_comparisons} documentos de otros usuarios.
+            </div>
+        </div>
+        <div class="similarity-results">
+    `;
+
+    results.comparisons.forEach((comparison, index) => {
+        html += `
+            <div class="similarity-item mb-3 p-3" style="border: 1px solid #dee2e6; border-radius: 6px; background: #f8f9fa;">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${comparison.title}</h6>
+                        <p class="text-muted mb-1">Autor: ${comparison.author}</p>
+                        <small class="text-muted">ID: ${comparison.document_id}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-${comparison.classification.color} fs-6">
+                            ${comparison.classification.icon} ${comparison.classification.percentage}%
+                        </span>
+                        <br>
+                        <small class="text-muted">${comparison.classification.level}</small>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+
+    html += `</div>`;
+
+    resultsDiv.innerHTML = html;
 }
