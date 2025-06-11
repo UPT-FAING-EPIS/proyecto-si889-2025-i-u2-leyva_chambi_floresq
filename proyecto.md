@@ -10,7 +10,7 @@ class: center, middle
 - 👤 Jerson Roni Chambi Cori  
 - 👤 Jaime Elias Flores Quispe  
 - 👤 Elvis Ronald Leyva Sardon  
-
+- 👤 Brian Danilo Chite Quispe 
 ---
 
 # 🚨 Problemática  
