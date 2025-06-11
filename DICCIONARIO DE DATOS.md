@@ -13,9 +13,9 @@ Docente: Ing. Patrick Jose Cuadros Quiroga
 
 Integrantes: 
 
-**Chambi Cori, Jerson Roni Flores Quispe, Jaime Elias Leyva Sardon, Elvis Ronald** 
+**Chambi Cori Jerson Roni ,Flores Quispe Jaime Elias, Leyva Sardon Elvis Ronald, Chite Quispe Brian Danilo** 
 
-**(2021072619) (2021070309) (2021072614)** 
+**(2021072619) (2021070309) (2021072614) (2021070015)**  
 
 **Tacna – Perú 2025** 
 
