@@ -12,6 +12,7 @@ Flores Quispe Jaime Elias (2021070309)
 
 Leyva Sardón Elvis Ronald (2021072614)
 
+Brian Danilo Chite Quispe (2021070015)
 
 # 🚀 Proyecto: Desarrollo de un Sistema de Conversión y Organización de Documentos Técnicos en Markdown con Estructuración Automática y Control de Versiones para los estudiantes en la facultad de Ingeniería de Sistemas
 
