@@ -20,6 +20,8 @@ __*Flores Quispe Jaime Elias			(2021070309)*__
 
 __*Leyva Sardón Elvis Ronald			(2021072614)*__
 
+__*Chite Quispe Brian Danilo			(2021070015)*__
+
 __Tacna – Perú__
 
 __*2025*__
