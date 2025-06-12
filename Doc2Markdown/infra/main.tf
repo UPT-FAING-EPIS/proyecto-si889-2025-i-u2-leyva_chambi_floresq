@@ -41,11 +41,14 @@ resource "azurerm_mssql_database" "db_docmark" {
   name                        = "DocMark"
   server_id                   = azurerm_mssql_server.server_proyecto_patrones.id
   sku_name                    = "GP_S_Gen5_2"
+  compute_model               = "Serverless"
   collation                   = "SQL_Latin1_General_CP1_CI_AS"
-  auto_pause_delay_in_minutes = 60
+  auto_pause_delay_in_minutes = 30
   min_capacity                = 0.5
+  max_capacity                = 2
   storage_account_type        = "Local"
 }
+
 
 # Regla de firewall para permitir acceso desde Azure
 resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
