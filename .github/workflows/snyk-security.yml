@@ -20,38 +20,22 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r Doc2Markdown/requirements.txt
+            pip install -r Doc2Markdown/requirements.txt  # Ajustado a la ruta correcta de tu archivo requirements.txt
 
-      - name: Install Snyk
-        run: npm install -g snyk@latest
-
-      - name: Authenticate with Snyk
-        run: npx snyk auth ${{ secrets.SNYK_TOKEN }}
-
-      - name: Run Snyk test
-        run: npx snyk test --file=Doc2Markdown/requirements.txt || true
-
-      - name: Monitor project with Snyk
-        run: npx snyk monitor --file=Doc2Markdown/requirements.txt
-
-      - name: Install Snyk-to-HTML
-        run: npm install -g snyk-to-html
-
-      - name: Snyk Code test
-        run: npx snyk code test --sarif-file-output=snyk.sarif --json-file-output=snyk-report.json || echo "Snyk code test completed with issues"
+      - name: Snyk Open Source & Code Analysis
+        uses: snyk/actions/python@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
-      - name: Verificar existencia del archivo SARIF
-        run: ls -la snyk.sarif
+        with:
+          args: --file=Doc2Markdown/requirements.txt --json-file-output=snyk-report.json --sarif-file-output=snyk.sarif || true
 
       - name: Mover archivo SARIF a Reportes
         run: |
-          mkdir -p ../Reportes
-          mv snyk.sarif ../Reportes/
+          mkdir -p ../Reportes  # Crea el directorio si no existe
+          mv snyk.sarif ../Reportes/  # Mueve el archivo SARIF a la carpeta Reportes
 
       - name: Generar reporte HTML desde SARIF
-        run: snyk-to-html -i ../Reportes/snyk.sarif -o ../Reportes/snyk-report.html
+        run: snyk-to-html -i ../Reportes/snyk.sarif -o ../Reportes/snyk-report.html 
 
       - name: Verificar existencia del reporte HTML
         run: ls -la ../Reportes/snyk-report.html
@@ -59,23 +43,23 @@ jobs:
       - name: Snyk Open Source monitor
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: npx snyk monitor --file=Doc2Markdown/requirements.txt
+        run: snyk monitor --file=Doc2Markdown/requirements.txt  # Ruta ajustada
 
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: ../Reportes/snyk.sarif
+          sarif_file: ../Reportes/snyk.sarif  
 
       - name: Configurar Git para publicar en GitHub Pages
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
+          
       - name: Publicar reporte en GitHub Pages
         run: |
-          git fetch origin gh-pages
-          git checkout gh-pages
-          cp ../Reportes/snyk-report.html reporte-snyk.html
+          git fetch origin gh-pages  # Obtiene la última versión de la rama gh-pages
+          git checkout gh-pages  # Cambia a la rama gh-pages
+          cp ../Reportes/snyk-report.html reporte-snyk.html  # Cambia el nombre al copiar
           git add reporte-snyk.html
-          git commit -m "Publicando reporte de Snyk como reporte-snyk.html" || echo "No hay cambios para commitear"
-          git push origin gh-pages
+          git commit -m "Publicando reporte de Snyk como reporte-snyk.html" || echo "No hay cambios para commitear"  # Manejo de caso si no hay cambios
+          git push origin gh-pages  # Publica sin usar --force
