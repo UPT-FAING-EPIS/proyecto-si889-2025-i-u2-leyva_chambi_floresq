@@ -44,7 +44,6 @@ resource "azurerm_mssql_database" "db_docmark" {
   collation                   = "SQL_Latin1_General_CP1_CI_AS"
   auto_pause_delay_in_minutes = 30
   min_capacity                = 0.5
-  max_capacity                = 1 
   max_size_gb                 = 32
   storage_account_type        = "Local"
 }
