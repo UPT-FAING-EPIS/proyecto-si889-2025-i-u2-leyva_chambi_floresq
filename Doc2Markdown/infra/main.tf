@@ -18,13 +18,13 @@ provider "azurerm" {
 
 # Grupo de recursos
 resource "azurerm_resource_group" "rg_proyecto_patrones" {
-  name     = "rg-proyecto-patrones"
+  name     = "rg-proyecto-patrones-u2"
   location = "East US 2"
 }
 
 # Servidor SQL
 resource "azurerm_mssql_server" "server_proyecto_patrones" {
-  name                         = "server-proyecto-patrones"
+  name                         = "server-proyecto-patrones-u2"
   resource_group_name          = azurerm_resource_group.rg_proyecto_patrones.name
   location                     = azurerm_resource_group.rg_proyecto_patrones.location
   version                      = "12.0"
@@ -49,7 +49,6 @@ resource "azurerm_mssql_database" "db_docmark" {
   storage_account_type        = "Local"
 }
 
-
 # Regla de firewall para permitir acceso desde Azure
 resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
   name             = "AllowAzureServices"
@@ -60,7 +59,7 @@ resource "azurerm_mssql_firewall_rule" "allow_azure_services" {
 
 # Plan de App service
 resource "azurerm_service_plan" "app_plan_proyecto_patrones" {
-  name                = "app-plan-proyecto-patrones"
+  name                = "app-plan-proyecto-patrones-u2"
   location            = azurerm_resource_group.rg_proyecto_patrones.location
   resource_group_name = azurerm_resource_group.rg_proyecto_patrones.name
   os_type             = "Linux"
@@ -69,7 +68,7 @@ resource "azurerm_service_plan" "app_plan_proyecto_patrones" {
 
 # Aplicación Web para FastAPI 
 resource "azurerm_linux_web_app" "webapp_proyecto_patrones" {
-  name                = "webapp-proyecto-patrones"
+  name                = "webapp-proyecto-patrones-u2"
   location            = azurerm_resource_group.rg_proyecto_patrones.location
   resource_group_name = azurerm_resource_group.rg_proyecto_patrones.name
   service_plan_id     = azurerm_service_plan.app_plan_proyecto_patrones.id
