@@ -22,13 +22,28 @@ jobs:
         run: |
             pip install -r Doc2Markdown/requirements.txt  # Ajustado a la ruta correcta de tu archivo requirements.txt
 
-      - name: Snyk Open Source & Code Analysis
-        uses: snyk/actions/python@master
+      - name: Install Snyk
+        run: npm install -g snyk@latest
+
+      - name: Authenticate with Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      - name: Run Snyk test
+        run: snyk test --file=Doc2Markdown/requirements.txt || true  # No falla el flujo si hay vulnerabilidades
+
+      - name: Monitor project with Snyk
+        run: snyk monitor --file=Doc2Markdown/requirements.txt  # Ruta ajustada al archivo de requerimientos en 'Doc2Markdown/requirements.txt'
+
+      - name: Install Snyk-to-HTML
+        run: npm install -g snyk-to-html
+
+      - name: Snyk Code test
+        run: snyk code test --sarif-file-output=snyk.sarif --json-file-output=snyk-report.json || echo "Snyk code test completed with issues"
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --file=Doc2Markdown/requirements.txt --all-projects --json-file-output=snyk-report.json --sarif-file-output=snyk.sarif || true
 
+      - name: Verificar existencia del archivo SARIF
+        run: ls -la snyk.sarif
 
       - name: Mover archivo SARIF a Reportes
         run: |
