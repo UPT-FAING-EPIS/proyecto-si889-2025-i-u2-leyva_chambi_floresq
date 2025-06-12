@@ -102,11 +102,20 @@ async function fetchDocuments() {
                     analyzeBtn.onclick = () => {
                         analyzeSimilarities(doc.document_id);
                     };
+
+                    // Agregar después de analyzeBtn
+                    const publishBtn = document.createElement("button");
+                    publishBtn.className = "btn btn-sm btn-outline-primary mx-1";
+                    publishBtn.textContent = "Publicar";
+                    publishBtn.onclick = () => {
+                        showPublishOptions(doc.document_id);
+                    };
                     
                     // Añadir botones al div de botones
                     buttonsDiv.appendChild(previewBtn);
                     buttonsDiv.appendChild(improveBtn);
                     buttonsDiv.appendChild(analyzeBtn);
+                    buttonsDiv.appendChild(publishBtn);
 
                     // Agregar ambos divs al li
                     li.appendChild(infoDiv);
@@ -454,4 +463,39 @@ function displaySimilarityResults(results) {
     html += `</div>`;
 
     resultsDiv.innerHTML = html;
+}
+
+// Función para mostrar opciones de publicación
+function showPublishOptions(documentId) {
+    const optionsHTML = `
+        <div id="publishModal" class="modal" style="display: block; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4);">
+            <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 400px; border-radius: 8px;">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h4 style="margin: 0;">📤 Opciones de Publicación</h4>
+                    <button id="closePublishModal" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Cómo quieres publicar tu documento?</p>
+                    <button class="btn btn-primary btn-block mb-2" onclick="publishAsReadme(${documentId})" style="width: 100%; margin-bottom: 10px;">
+                        📝 Subir como README
+                    </button>
+                    <button class="btn btn-secondary btn-block" disabled style="width: 100%;">
+                        📚 Subir como Wiki (Próximamente)
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', optionsHTML);
+    
+    document.getElementById('closePublishModal').onclick = function() {
+        document.getElementById('publishModal').remove();
+    };
+}
+
+// Función para publicar como README
+function publishAsReadme(documentId) {
+    document.getElementById('publishModal').remove();
+    window.location.href = `/github/login?document_id=${documentId}`;
 }

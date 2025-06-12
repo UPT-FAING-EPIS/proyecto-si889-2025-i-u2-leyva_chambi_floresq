@@ -11,6 +11,11 @@ import os
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from app.controllers.similarity_controller import router as similarity_router
+from app.controllers.github_controller import GitHubController
+from fastapi import Form, Query
+from sqlalchemy.orm import Session
+from config.database import get_db
+
 
 # Crear tablas en la base de datos
 Base.metadata.create_all(bind=engine)
@@ -80,3 +85,26 @@ async def version_history_page(request: Request):
 @app.get("/improved_document/{document_id}", response_class=HTMLResponse)
 async def improved_document_page(request: Request, document_id: int):
     return templates.TemplateResponse("improved_document.html", {"request": request, "document_id": document_id})
+
+# Rutas de GitHub
+@app.get("/github/login")
+async def github_login(request: Request, document_id: str = Query(...)):
+    return GitHubController.login(request, document_id)
+
+@app.get("/github/callback")
+async def github_callback(
+    request: Request, 
+    code: str = Query(None), 
+    state: str = Query(None)
+):
+    return await GitHubController.callback(request, code, state)
+
+@app.post("/github/upload-readme")
+async def github_upload_readme(
+    document_id: str = Form(...),
+    repo_name: str = Form(...),
+    access_token: str = Form(...),
+    github_user: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    return await GitHubController.upload_readme(document_id, repo_name, access_token, github_user, db)

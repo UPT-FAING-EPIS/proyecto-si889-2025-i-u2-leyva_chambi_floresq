@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>📂 Selecciona un Repositorio</h1>
+    {% if repos %}
+    <p>Selecciona el repositorio público donde quieres subir tu README.md:</p>
+    <div class="repo-list">
+        {% for repo in repos %}
+        <div class="repo-item" data-repo="{{ repo.name }}" style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; cursor: pointer; border-radius: 5px;">
+            <div class="repo-name"><strong>{{ repo.name }}</strong></div>
+            {% if repo.description %}
+            <div class="repo-description">{{ repo.description }}</div>
+            {% endif %}
+            <div class="repo-meta">
+                ⭐ {{ repo.stargazers_count }} | 
+                🍴 {{ repo.forks_count }} | 
+                📅 Actualizado: {{ repo.updated_at[:10] }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="upload-section">
+        <div id="selectedInfo" class="selected-info" style="display: none; margin: 15px 0; padding: 10px; background: #f8f9fa; border-radius: 5px;"></div>
+        <button id="uploadBtn" class="btn btn-primary" disabled data-document-id="{{ document_id }}">
+            📤 Subir README.md al repositorio seleccionado
+        </button>
+        <div id="loading" class="loading" style="display: none; margin: 15px 0;">
+            <div class="spinner-border"></div>
+            <p>Subiendo archivo...</p>
+        </div>
+        <div id="result" class="result"></div>
+    </div>
+    {% else %}
+    <div class="no-repos">
+        <h3>😔 No se encontraron repositorios públicos</h3>
+        <p>Asegúrate de tener al menos un repositorio público en tu cuenta de GitHub.</p>
+        <a href="https://github.com/new" target="_blank" class="btn btn-primary">Crear nuevo repositorio</a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+let selectedRepo = null;
+const uploadBtn = document.getElementById('uploadBtn');
+const documentId = uploadBtn.dataset.documentId;
+
+document.querySelectorAll('.repo-item').forEach(item => {
+    item.addEventListener('click', function() {
+        document.querySelectorAll('.repo-item').forEach(i => i.style.border = '1px solid #ddd');
+        this.style.border = '2px solid #007bff';
+        selectedRepo = this.dataset.repo;
+        
+        const selectedInfo = document.getElementById('selectedInfo');
+        selectedInfo.innerHTML = `📁 Repositorio seleccionado: <strong>${selectedRepo}</strong>`;
+        selectedInfo.style.display = 'block';
+        uploadBtn.disabled = false;
+    });
+});
+
+uploadBtn.addEventListener('click', async function() {
+    if (!selectedRepo) return;
+    
+    const loading = document.getElementById('loading');
+    const result = document.getElementById('result');
+    
+    loading.style.display = 'block';
+    uploadBtn.disabled = true;
+    result.style.display = 'none';
+    
+    try {
+        const formData = new FormData();
+        formData.append('document_id', documentId);
+        formData.append('repo_name', selectedRepo);
+        
+        const response = await fetch('/github/upload-readme', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        loading.style.display = 'none';
+        result.style.display = 'block';
+        
+        if (data.success) {
+            result.className = 'alert alert-success';
+            result.innerHTML = `
+                <h4>✅ ${data.message}</h4>
+                <p><a href="${data.repo_url}" target="_blank">Ver repositorio en GitHub</a></p>
+            `;
+        } else {
+            result.className = 'alert alert-danger';
+            result.innerHTML = `<h4>❌ Error</h4><p>${data.error}</p>`;
+            uploadBtn.disabled = false;
+        }
+    } catch (error) {
+        loading.style.display = 'none';
+        result.style.display = 'block';
+        result.className = 'alert alert-danger';
+        result.innerHTML = `<h4>❌ Error</h4><p>Error de conexión: ${error.message}</p>`;
+        uploadBtn.disabled = false;
+    }
+});
+</script>
+{% endblock %}

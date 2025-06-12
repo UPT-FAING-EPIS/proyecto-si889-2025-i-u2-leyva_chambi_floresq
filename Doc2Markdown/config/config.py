@@ -2,9 +2,15 @@ import os
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
 
+# Cargar variables de entorno al inicio
 load_dotenv()
 
 class Config:
+    # Configuración de GitHub
+    GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
+    GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
+    GITHUB_REDIRECT_URI = "http://localhost:8000/github/callback"  # Cambiado a puerto 8000 para FastAPI
+    
     # # Configuración de Azure SQL
     # SQL_SERVER = os.getenv('SQL_SERVER', 'server-proyecto-patrones.database.windows.net')
     # SQL_DATABASE = os.getenv('SQL_DATABASE', 'DocMark')
@@ -21,9 +27,8 @@ class Config:
     #     "trustservercertificate=no&"
     #     "connection_timeout=30"
     # )
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///docmark.db'
-
     
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///docmark.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Configuración de la aplicación
@@ -32,9 +37,7 @@ class Config:
     
     # Configuración de Markdown
     MARKDOWN_EXTENSIONS = ['extra', 'codehilite', 'tables', 'toc']
-
     ACCESS_TOKEN_EXPIRE_MINUTES = 30 
-
     SECRET_KEY = os.getenv('SECRET_KEY', 'mWJkMUtLpXO~>Qlhu|iLj~=%C,T/?fsZ')
     
     @staticmethod
