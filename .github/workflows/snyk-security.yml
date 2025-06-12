@@ -29,6 +29,9 @@ jobs:
         with:
           args: --file=Doc2Markdown/requirements.txt --json-file-output=snyk-report.json --sarif-file-output=snyk.sarif --skip-unresolved || true  
 
+      - name: Install snyk-to-html
+        run: npm install -g snyk-to-html
+      
       - name: Mover archivo SARIF a Reportes
         run: |
           mkdir -p ../Reportes  # Crea el directorio si no existe
