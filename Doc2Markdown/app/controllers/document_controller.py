@@ -348,7 +348,7 @@ async def improve_document(
         
         # Reinsertar las imágenes en el contenido mejorado
         def reinsert_image(match):
-            image_id = match.group(2)  # Cambiado de group(1) a group(2) para capturar el UUID correctamente
+            image_id = match.group(2)
             if image_id in extracted_images:
                 img = extracted_images[image_id]
                 return f'![{img["alt_text"]}]({img["data"]})'
