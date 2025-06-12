@@ -76,3 +76,6 @@ dependencies = [
 
 [project.urls]
 "Homepage" = "https://github.com/UPT-FAING-EPIS/proyecto-si889-2025-i-u2-leyva_chambi_floresq"
+
+[tool.setuptools.packages.find]
+where = ["Doc2Markdown"]
