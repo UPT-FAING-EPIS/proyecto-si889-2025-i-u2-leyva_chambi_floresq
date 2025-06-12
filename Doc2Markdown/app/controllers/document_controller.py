@@ -309,12 +309,12 @@ async def improve_document(
         from azure.ai.inference.models import SystemMessage, UserMessage
         from azure.core.credentials import AzureKeyCredential
         
-        endpoint = "https://elvle-ma7lv0mp-eastus2.services.ai.azure.com/models"
+        endpoint = "https://brichite-5721-resource.services.ai.azure.com/models"
         model_name = "DeepSeek-R1"
         
         client = ChatCompletionsClient(
             endpoint=endpoint,
-            credential=AzureKeyCredential("5W72u700MMJdrQ2aHhUxbD1iN5G86vkOVkfTcQylM1XwrhCMt3NSJQQJ99BEACHYHv6XJ3w3AAAAACOGUZnR"),
+            credential=AzureKeyCredential("28n9rkyEu95V23HkJ54vUD9uDHEuqU91VlRhI59toTyZam4c5B4SJQQJ99BFACHYHv6XJ3w3AAAAACOG2nmM"),
         )
         
         system_prompt = """Eres un asistente especializado en mejorar documentos Markdown. 
