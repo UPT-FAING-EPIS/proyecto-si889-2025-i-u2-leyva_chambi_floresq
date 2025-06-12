@@ -24,10 +24,5 @@ CREATE TABLE documents (
 INSERT INTO users (username, email, password_hash) 
 VALUES ('Jaime', 'jaime.doe@example.com', '$2b$12$40EHCl91BqgJsvJ8XAXwzuoZ4sGze4pCroHcjqM6W419UNJtDrXtK'),
        ('Yoelito', 'yoelito.smith@example.com', '$2b$12$40EHCl91BqgJsvJ8XAXwzuoZ4sGze4pCroHcjqM6W419UNJtDrXtK'),
-	   ('Elvicito', 'elvicito.smith@example.com', '$2b$12$40EHCl91BqgJsvJ8XAXwzuoZ4sGze4pCroHcjqM6W419UNJtDrXtK');
-
-INSERT INTO documents (user_id, title, original_format, markdown_content) 
-VALUES (1, 'Sample Document 1', 'DOC', 'This is the content of the document in markdown format.'), 
-       (2, 'Sample Document 2', 'DOCX', 'Another markdown content here.'),
-	   (3, 'Sample Document 3', 'DOCX', 'Another markdown content here.');
-
+	   ('Elvicito', 'elvicito.smith@example.com', '$2b$12$40EHCl91BqgJsvJ8XAXwzuoZ4sGze4pCroHcjqM6W419UNJtDrXtK'),
+	   ('Danilo', 'danilo.smith@example.com', '$2b$12$40EHCl91BqgJsvJ8XAXwzuoZ4sGze4pCroHcjqM6W419UNJtDrXtK');

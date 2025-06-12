@@ -11,24 +11,24 @@ class Config:
     GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
     GITHUB_REDIRECT_URI = "http://localhost:8000/github/callback"  # Cambiado a puerto 8000 para FastAPI
     
-    # # Configuración de Azure SQL
-    # SQL_SERVER = os.getenv('SQL_SERVER', 'server-proyecto-patrones.database.windows.net')
-    # SQL_DATABASE = os.getenv('SQL_DATABASE', 'DocMark')
-    # SQL_USERNAME = os.getenv('SQL_USERNAME', 'sqladminuser')
-    # SQL_PASSWORD = os.getenv('SQL_PASSWORD', 'Kxj0mchx@')
-    # SQL_DRIVER = os.getenv('SQL_DRIVER', 'ODBC Driver 17 for SQL Server')
+    # Configuración de Azure SQL
+    SQL_SERVER = os.getenv('SQL_SERVER', 'server-proyecto-patrones-u2.database.windows.net')
+    SQL_DATABASE = os.getenv('SQL_DATABASE', 'DocMark')
+    SQL_USERNAME = os.getenv('SQL_USERNAME', 'sqladminuser')
+    SQL_PASSWORD = os.getenv('SQL_PASSWORD', 'Danilo123456@')
+    SQL_DRIVER = os.getenv('SQL_DRIVER', 'ODBC Driver 17 for SQL Server')
     
-    # # Cadena de conexión - Formato corregido
-    # SQLALCHEMY_DATABASE_URI = (
-    #     f"mssql+pyodbc://{SQL_USERNAME}:{quote_plus(SQL_PASSWORD)}@"
-    #     f"{SQL_SERVER}/{SQL_DATABASE}?"
-    #     f"driver={quote_plus('ODBC Driver 17 for SQL Server')}&"
-    #     "encrypt=yes&"
-    #     "trustservercertificate=no&"
-    #     "connection_timeout=30"
-    # )
+    # Cadena de conexión - Formato corregido
+    SQLALCHEMY_DATABASE_URI = (
+        f"mssql+pyodbc://{SQL_USERNAME}:{quote_plus(SQL_PASSWORD)}@"
+        f"{SQL_SERVER}/{SQL_DATABASE}?"
+        f"driver={quote_plus('ODBC Driver 17 for SQL Server')}&"
+        "encrypt=yes&"
+        "trustservercertificate=no&"
+        "connection_timeout=30"
+    )
     
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///docmark.db'
+    # SQLALCHEMY_DATABASE_URI = 'sqlite:///docmark.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Configuración de la aplicación
