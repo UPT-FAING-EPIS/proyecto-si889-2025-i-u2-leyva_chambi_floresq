@@ -1,0 +1,143 @@
+name: Unified Analysis and Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  analysis:
+    runs-on: ubuntu-latest
+    outputs:
+      coverage_dir: ${{ steps.coverage_dir.outputs.coverage_dir }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ------ SONARCLOUD -------
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$(pwd)/Doc2Markdown" >> $GITHUB_ENV
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential unixodbc-dev
+
+      - name: Install Java 17
+        run: |
+          sudo apt update
+          sudo apt install -y openjdk-17-jdk
+          java -version
+
+      - name: Install SonarScanner
+        run: |
+          curl -L "https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-6.2.1.4610-linux-x64.zip" -o sonar-scanner-linux.zip
+          unzip sonar-scanner-linux.zip -d /opt
+          sudo ln -s /opt/sonar-scanner-6.2.1.4610-linux-x64/bin/sonar-scanner /usr/local/bin/sonar-scanner
+          sonar-scanner --version
+
+      - name: Install dependencies
+        run: pip install -r Doc2Markdown/requirements.txt
+
+      # Run SonarCloud Analysis 
+      - name: Run SonarCloud Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          cd Doc2Markdown/app
+          sonar-scanner \
+            -Dsonar.projectKey=jaimeflores_doc2markdown \
+            -Dsonar.organization=jaimeflores \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.python.coverage.reportPaths=report_coverage/coverage.xml
+
+      # Backup htmlcov for later
+      - name: Backup htmlcov folder
+        run: |
+          mkdir -p Reportes/htmlcov
+          cp -r Doc2Markdown/report_coverage/htmlcov/* Reportes/htmlcov/
+
+      # ------ SNYK -------
+      - name: Snyk Open Source & Code Analysis
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file=Doc2Markdown/requirements.txt --json-file-output=snyk-report.json --sarif-file-output=snyk.sarif --skip-unresolved || true
+
+      - name: Install snyk-to-html
+        run: npm install -g snyk-to-html
+
+      - name: Generar reporte HTML Snyk
+        run: snyk-to-html -i snyk.sarif -o Reportes/snyk-report.html
+
+      # ------ SEMGREP -------
+      - name: Set up Semgrep
+        run: docker pull semgrep/semgrep
+
+      - name: Run Semgrep (SARIF Output)
+        run: docker run --rm -v $(pwd):/src semgrep/semgrep semgrep scan --config="p/default" --sarif --output=semgrep.sarif --metrics=off
+
+      - name: Run Semgrep (JSON Output)
+        run: docker run --rm -v $(pwd):/src semgrep/semgrep semgrep scan --config="p/default" --json --output semgrep.json --metrics=off
+
+      - name: Install prospector-html
+        run: python -m pip install prospector2html
+
+      - name: Convert Semgrep results to HTML
+        run: prospector-html --input semgrep.json --output Reportes/semgrep-report.html --filter semgrep || true
+
+      # ------ UPLOAD SARIF TO GITHUB CODE SCANNING ------
+      - name: Upload Snyk SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk.sarif
+
+      - name: Upload Semgrep SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+
+      # ------ STORE REPORTES ARTIFACT FOR PUBLISH JOB ------
+      - name: Archive Reportes for publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: reportes
+          path: Reportes
+
+  publish:
+    needs: analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Reportes artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: reportes
+          path: Reportes
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Configure Git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Copy all unified reports to gh-pages
+        run: |
+          mkdir -p htmlcov
+          cp -r Reportes/htmlcov/* htmlcov/ || true
+          cp Reportes/snyk-report.html reporte-snyk.html || true
+          cp Reportes/semgrep-report.html reporte-semgrep.html || true
+
+      - name: Commit and push all reports
+        run: |
+          git add htmlcov reporte-snyk.html reporte-semgrep.html || true
+          git commit -m "Publishing all analysis reports (SonarCloud, Snyk, Semgrep)" || echo "No changes to commit"
+          git pull --rebase origin gh-pages
+          git push origin gh-pages
