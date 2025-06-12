@@ -478,9 +478,11 @@ function showPublishOptions(documentId) {
                     <p>¿Cómo quieres publicar tu documento?</p>
                     <button class="btn btn-primary btn-block mb-2" onclick="publishAsReadme(${documentId})" style="width: 100%; margin-bottom: 10px;">
                         📝 Subir como README
+                        <small class="d-block text-muted">Se creará/actualizará el README.md del repositorio</small>
                     </button>
-                    <button class="btn btn-secondary btn-block" disabled style="width: 100%;">
-                        📚 Subir como Wiki (Próximamente)
+                    <button class="btn btn-info btn-block" onclick="publishAsWiki(${documentId})" style="width: 100%;">
+                        📚 Subir como Wiki
+                        <small class="d-block text-muted">Se creará una página en la wiki del repositorio</small>
                     </button>
                 </div>
             </div>
@@ -497,5 +499,11 @@ function showPublishOptions(documentId) {
 // Función para publicar como README
 function publishAsReadme(documentId) {
     document.getElementById('publishModal').remove();
-    window.location.href = `/github/login?document_id=${documentId}`;
+    window.location.href = `/github/login?document_id=${documentId}&publish_type=readme`;
+}
+
+// Función para publicar como Wiki
+function publishAsWiki(documentId) {
+    document.getElementById('publishModal').remove();
+    window.location.href = `/github/login?document_id=${documentId}&publish_type=wiki`;
 }

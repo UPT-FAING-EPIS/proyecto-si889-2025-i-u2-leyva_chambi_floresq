@@ -88,8 +88,12 @@ async def improved_document_page(request: Request, document_id: int):
 
 # Rutas de GitHub
 @app.get("/github/login")
-async def github_login(request: Request, document_id: str = Query(...)):
-    return GitHubController.login(request, document_id)
+async def github_login(
+    request: Request, 
+    document_id: str = Query(...),
+    publish_type: str = Query(default="readme")
+):
+    return GitHubController.login(request, document_id, publish_type)
 
 @app.get("/github/callback")
 async def github_callback(
@@ -108,3 +112,13 @@ async def github_upload_readme(
     db: Session = Depends(get_db)
 ):
     return await GitHubController.upload_readme(document_id, repo_name, access_token, github_user, db)
+
+@app.post("/github/upload-wiki")
+async def github_upload_wiki(
+    document_id: str = Form(...),
+    repo_name: str = Form(...),
+    access_token: str = Form(...),
+    github_user: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    return await GitHubController.upload_wiki(document_id, repo_name, access_token, github_user, db)
