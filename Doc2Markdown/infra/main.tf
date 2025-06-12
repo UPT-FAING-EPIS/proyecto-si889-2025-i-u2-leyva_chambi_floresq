@@ -40,12 +40,12 @@ resource "azurerm_mssql_server" "server_proyecto_patrones" {
 resource "azurerm_mssql_database" "db_docmark" {
   name                        = "DocMark"
   server_id                   = azurerm_mssql_server.server_proyecto_patrones.id
-  sku_name                    = "GP_S_Gen5_2"
-  compute_model               = "Serverless"
+  sku_name                    = "GP_S_Gen5_1"
   collation                   = "SQL_Latin1_General_CP1_CI_AS"
   auto_pause_delay_in_minutes = 30
   min_capacity                = 0.5
-  max_capacity                = 2
+  max_capacity                = 1 
+  max_size_gb                 = 32
   storage_account_type        = "Local"
 }
 
