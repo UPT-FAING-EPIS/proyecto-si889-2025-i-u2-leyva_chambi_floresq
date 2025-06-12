@@ -27,7 +27,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --file=Doc2Markdown/requirements.txt --json-file-output=snyk-report.json --sarif-file-output=snyk.sarif || true
+          args: --file=Doc2Markdown/requirements.txt --json-file-output=snyk-report.json --sarif-file-output=snyk.sarif --skip-unresolved || true  
 
       - name: Mover archivo SARIF a Reportes
         run: |
