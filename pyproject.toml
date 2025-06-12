@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "doc2markdown"
+version = "0.1.0"
+description = "Aplicación FastAPI para conversión y gestión de documentos"
+authors = [
+    { name="jf2021070309-doc2markdown", email="jaimeelias.tacna.2016@gmail.com" }
+]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "annotated-types==0.7.0",
+    "anyio==4.9.0",
+    "azure-ai-inference==1.0.0b9",
+    "azure-core==1.34.0",
+    "bcrypt==4.0.1",
+    "beautifulsoup4==4.13.4",
+    "blinker==1.9.0",
+    "certifi==2025.4.26",
+    "cffi==1.17.1",
+    "charset-normalizer==3.4.1",
+    "click==8.1.8",
+    "cobble==0.1.4",
+    "colorama==0.4.6",
+    "coverage==7.8.0",
+    "cryptography==44.0.2",
+    "ecdsa==0.19.1",
+    "fastapi==0.115.12",
+    "greenlet==3.2.1",
+    "gunicorn==23.0.0",
+    "h11==0.16.0",
+    "html2text==2025.4.15",
+    "httpcore==1.0.9",
+    "httpx==0.28.1",
+    "idna==3.10",
+    "iniconfig==2.1.0",
+    "isodate==0.7.2",
+    "itsdangerous==2.2.0",
+    "Jinja2==3.1.6",
+    "mammoth==1.9.0",
+    "Markdown==3.8",
+    "MarkupSafe==3.0.2",
+    "packaging==25.0",
+    "passlib==1.7.4",
+    "pdfminer.six==20250327",
+    "pdfplumber==0.11.6",
+    "pillow==11.2.1",
+    "pluggy==1.5.0",
+    "pyasn1==0.4.8",
+    "pycparser==2.22",
+    "pydantic==2.11.3",
+    "pydantic_core==2.33.1",
+    "pyodbc==5.2.0",
+    "pypdfium2==4.30.1",
+    "pytest==8.3.5",
+    "pytest-cov==6.1.1",
+    "python-dotenv==1.1.0",
+    "python-jose==3.4.0",
+    "python-multipart==0.0.20",
+    "requests==2.32.3",
+    "rsa==4.9.1",
+    "six==1.17.0",
+    "sniffio==1.3.1",
+    "soupsieve==2.7",
+    "SQLAlchemy==2.0.40",
+    "starlette==0.46.2",
+    "typing-inspection==0.4.0",
+    "typing_extensions==4.13.2",
+    "urllib3==2.4.0",
+    "uvicorn==0.32.1",
+    "Werkzeug==3.1.3"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/UPT-FAING-EPIS/proyecto-si889-2025-i-u2-leyva_chambi_floresq"
