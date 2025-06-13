@@ -9,7 +9,7 @@ class Config:
     # Configuración de GitHub
     GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
     GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
-    GITHUB_REDIRECT_URI = "http://localhost:8000/github/callback"  # Cambiado a puerto 8000 para FastAPI
+    GITHUB_REDIRECT_URI = "http://127.0.0.1:8000/github/callback"  # Cambiado a puerto 8000 para FastAPI
     
     # Configuración de Azure SQL
     SQL_SERVER = os.getenv('SQL_SERVER', 'server-proyecto-patrones-u2.database.windows.net')
