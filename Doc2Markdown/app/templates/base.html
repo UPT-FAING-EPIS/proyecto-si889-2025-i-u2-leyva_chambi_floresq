@@ -9,29 +9,44 @@
     <link href="/static/css/style.css" rel="stylesheet">
     <link href="/static/css/animations.css" rel="stylesheet">
     <link href="/static/css/components.css" rel="stylesheet">
+    <style>
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+        }
+        .navbar-brand img {
+            height: 32px;
+            width: auto;
+            margin-right: 10px;
+        }
+        @media (max-width: 768px) {
+            .navbar-brand img {
+                height: 28px;
+            }
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="/">Doc2Markdown</a>
+            <a class="navbar-brand" href="/">
+                <img src="/static/images/logo.png" alt="Doc2Markdown Logo">
+                Doc2Markdown
+            </a>
             <div class="d-flex" id="authButtons">
                 <!-- Botones que se muestran si el usuario NO está autenticado -->
                 <a href="/login" class="btn btn-light me-2" id="loginBtn">Login</a>
                 <a href="/register" class="btn btn-warning" id="registerBtn">Registrarse</a>
-
                 <!-- Botón de Cerrar sesión, solo visible si el usuario está autenticado -->
                 <a href="#" class="btn btn-danger me-2" id="logoutBtn" style="display:none;">Cerrar sesión</a>
-
                 <!-- Nombre de usuario (opcional) -->
                 <span id="userName" class="ms-2" style="display:none;"></span>
             </div>
         </div>
     </nav>
-
     <main class="container my-4">
         {% block content %}{% endblock %}
     </main>
-
     <script src="/static/js/main.js"></script>
 </body>
 </html>
