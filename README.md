@@ -16,6 +16,15 @@ Brian Danilo Chite Quispe (2021070015)
 
 Este proyecto permite la conversión automática de documentos en diversos formatos (Word, PDF, HTML, TXT) al formato **Markdown** y la organización de estos documentos en un sistema estructurado con control de versiones. El proyecto está diseñado para estudiantes y docentes de la Facultad de Ingeniería de Sistemas de la Universidad Privada de Tacna.
 
+## Tecnologías y Herramientas Principales
+
+- **Cosine Similarity**: Integrado para la detección de plagio entre documentos, permitiendo comparar la similitud entre textos de manera eficiente.
+- **Deepseek Azure AI Foundry**: Se emplea inteligencia artificial para mejorar el procesamiento y análisis de los documentos, aportando capacidades avanzadas de clasificación y organización automática.
+- **FastAPI**: Framework utilizado para la creación de APIs rápidas, eficientes y fáciles de mantener, facilitando la interacción con el sistema y la integración con otros servicios.
+- **Control de Versiones**: Gestión y seguimiento de los cambios realizados a los documentos, asegurando integridad y trazabilidad.
+- **Terraform**: Para la gestión y despliegue de infraestructura, especialmente útil para entornos en la nube.
+- **SQL Server / Azure SQL**: Base de datos centralizada para almacenamiento y consulta eficiente de los documentos y metadatos.
+
 ## Requisitos del Sistema
 
 Antes de instalar y ejecutar el proyecto, asegúrate de tener los siguientes requisitos:
