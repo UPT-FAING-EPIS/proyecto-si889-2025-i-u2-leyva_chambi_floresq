@@ -89,11 +89,20 @@ async def improved_document_page(request: Request, document_id: int):
 # Rutas de GitHub
 @app.get("/github/login")
 async def github_login(
-    request: Request, 
-    document_id: str = Query(...),
-    publish_type: str = Query(default="readme")
+    request: Request,
+    document_id: str = Query(None),
+    document_ids: str = Query(None),
+    publish_type: str = Query("readme"),
+    add_home: str = Query(None),
+    organization: str = Query(None),
+    project_title: str = Query(None),
+    context: str = Query(None),
+    members: str = Query(None)
 ):
-    return GitHubController.login(request, document_id, publish_type)
+    return GitHubController.login(
+        request, document_id, document_ids, publish_type,
+        add_home, organization, project_title, context, members
+    )
 
 @app.get("/github/callback")
 async def github_callback(
@@ -122,3 +131,17 @@ async def github_upload_wiki(
     db: Session = Depends(get_db)
 ):
     return await GitHubController.upload_wiki(document_id, repo_name, access_token, github_user, db)
+
+# Agregar esta ruta junto con las otras rutas de GitHub
+@app.post("/github/upload-wiki-multiple")
+async def upload_wiki_multiple(
+    document_ids: str = Form(...),
+    repo_name: str = Form(...),
+    access_token: str = Form(...),
+    github_user: str = Form(...),
+    home_page_data: str = Form(None),
+    db: Session = Depends(get_db)
+):
+    return await GitHubController.upload_wiki_multiple(
+        document_ids, repo_name, access_token, github_user, home_page_data, db
+    )
