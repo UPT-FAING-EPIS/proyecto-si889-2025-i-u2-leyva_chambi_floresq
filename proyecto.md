@@ -42,7 +42,9 @@ En la Facultad de Ingeniería de Sistemas, los estudiantes enfrentan dificultade
 - 🧾 Organización estructurada  
 - 🔄 Control de versiones  
 - 🤖 Mejora automatizada con IA  
-- 👁️ Previsualización en tiempo real  
+- 👁️ Previsualización en tiempo real
+- 🧠 Identificador de Plageo
+- 🌐 Publicación en plataformas externas (GitHub)
 
 ---
 
@@ -76,4 +78,18 @@ En la Facultad de Ingeniería de Sistemas, los estudiantes enfrentan dificultade
 🖥️ Visualizar el documento Markdown a medida que se edita  
 🎯 Evitar errores de formato o estructura  
 
----
+### 🧠 5. Identificador de Plageo
+📊 Calcular similitud mediante Cosine Similarity
+🔍 Identificar contenido redundante o plagiado
+
+### 🌐 6. Publicar archivo como README en GitHub
+📤 Subir documento Markdown como README.md al repositorio del usuario
+🔐 Usar autenticación mediante token GitHub
+
+### 🌐 7. Publicar documentos individuales en Wiki de GitHub
+📄 Permitir subir un archivo Markdown como página Wiki
+
+### 📚 8. Publicar múltiples archivos con índice en Wiki
+📂 Publicar varios archivos Markdown como páginas
+🧭 Generar automáticamente página de inicio con enlaces (índice navegable)
+
