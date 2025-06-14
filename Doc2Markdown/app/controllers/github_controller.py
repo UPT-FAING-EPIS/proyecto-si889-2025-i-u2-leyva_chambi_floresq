@@ -198,7 +198,7 @@ class GitHubController:
     def _generate_repo_list(repos, documents_info, access_token, user_data, publish_type, mode="single", home_page_info=None):
         if not repos:
             if publish_type == "wiki":
-                return """
+                return f"""
                 <div class="no-repos">
                     <h3>😔 No se encontraron repositorios con wikis habilitadas</h3>
                     <p>Para usar esta función, necesitas:</p>
@@ -206,15 +206,21 @@ class GitHubController:
                         <li>Tener al menos un repositorio público</li>
                         <li>Habilitar las wikis en la configuración del repositorio</li>
                     </ul>
-                    <a href="https://github.com/new" target="_blank" class="btn btn-primary">Crear nuevo repositorio</a>
+                    <div style="margin-top: 20px;">
+                        <a href="https://github.com/new" target="_blank" class="btn btn-primary" style="margin-right: 10px;">Crear nuevo repositorio</a>
+                        <a href="/document_conversion" class="btn btn-secondary">🔙 Regresar al inicio</a>
+                    </div>
                 </div>
                 """
             else:
-                return """
+                return f"""
                 <div class="no-repos">
                     <h3>😔 No se encontraron repositorios públicos</h3>
                     <p>Asegúrate de tener al menos un repositorio público en tu cuenta de GitHub.</p>
-                    <a href="https://github.com/new" target="_blank" class="btn btn-primary">Crear nuevo repositorio</a>
+                    <div style="margin-top: 20px;">
+                        <a href="https://github.com/new" target="_blank" class="btn btn-primary" style="margin-right: 10px;">Crear nuevo repositorio</a>
+                        <a href="/document_conversion" class="btn btn-secondary">🔙 Regresar al inicio</a>
+                    </div>
                 </div>
                 """
         
@@ -233,7 +239,16 @@ class GitHubController:
             action_text = "README.md"
             upload_button_text = "📤 Subir README.md al repositorio seleccionado"
         
-        repo_html = f"<p>Selecciona el repositorio donde quieres subir tu {action_text}:</p><div class='repo-list'>"
+        repo_html = f"""
+        <div style="margin-bottom: 20px;">
+            <a href="/document_conversion" class="btn btn-secondary" style="margin-right: 10px;">
+                🔙 Regresar al inicio
+            </a>
+        </div>
+        
+        <p>Selecciona el repositorio donde quieres subir tu {action_text}:</p>
+        <div class='repo-list'>"""
+        
         for i, repo in enumerate(repos):
             wiki_indicator = "📚 Wiki habilitada" if publish_type == "wiki" and repo.get('has_wiki') else ""
             repo_html += f"""
@@ -255,9 +270,16 @@ class GitHubController:
         repo_html += f"""</div>
         <div class="upload-section" style="margin-top: 20px;">
             <div id="selectedInfo" class="selected-info" style="display: none; margin: 15px 0; padding: 10px; background: #e3f2fd; border-radius: 5px; border-left: 4px solid #2196f3;"></div>
-            <button id="uploadBtn" class="btn btn-primary" disabled style="padding: 10px 20px;">
-                {upload_button_text}
-            </button>
+            
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <button id="uploadBtn" class="btn btn-primary" disabled style="padding: 10px 20px;">
+                    {upload_button_text}
+                </button>
+                <a href="/document_conversion" class="btn btn-outline-secondary" style="padding: 10px 20px; text-decoration: none;">
+                    🔙 Cancelar y regresar
+                </a>
+            </div>
+            
             <div id="loading" class="loading" style="display: none; margin: 15px 0; text-align: center;">
                 <div class="spinner-border" role="status" style="margin-bottom: 10px;">
                     <span class="visually-hidden">Loading...</span>
@@ -273,6 +295,14 @@ class GitHubController:
         .repo-item.selected {{
             border: 2px solid #007bff !important;
             background-color: #f0f8ff !important;
+        }}
+        .btn-outline-secondary {{
+            border: 1px solid #6c757d;
+            color: #6c757d;
+        }}
+        .btn-outline-secondary:hover {{
+            background-color: #6c757d;
+            color: white;
         }}
         </style>"""
         return repo_html
@@ -374,7 +404,9 @@ class GitHubController:
                     
                     if (data.success) {{
                         result.className = 'alert alert-success';
-                        result.innerHTML = '<h4>✅ ' + data.message + '</h4><p><a href="' + data.repo_url + '" target="_blank">Ver repositorio en GitHub</a></p>';
+                        result.innerHTML = '<h4>✅ ' + data.message + '</h4>' +
+                        '<p><a href="' + data.repo_url + '" target="_blank" class="btn btn-success" style="margin-right: 10px;">📖 Ver repositorio en GitHub</a>' +
+                        '<a href="/document_conversion" class="btn btn-primary">🏠 Regresar al inicio</a></p>';
                     }} else {{
                         result.className = 'alert alert-danger';
                         result.innerHTML = '<h4>❌ Error</h4><p>' + data.error + '</p>';
