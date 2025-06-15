@@ -25,6 +25,29 @@ Este proyecto permite la conversión automática de documentos en diversos forma
 - **Terraform**: Para la gestión y despliegue de infraestructura, especialmente útil para entornos en la nube.
 - **SQL Server / Azure SQL**: Base de datos centralizada para almacenamiento y consulta eficiente de los documentos y metadatos.
 
+## Diagrama caso de uso 
+
+![./media/media/doc1.png](./media/doc1.png)
+
+## Paquetes de secuencia 
+![./media/media/doc2.png](./media/doc2.png)
+##  1. Validar formato de archivo
+![./media/media/doc3.png](./media/doc3.png)
+
+
+## Diagrama de arquitectura software
+![./media/media/doc4.png](./media/doc4.png)
+## Diagrama de arquitectura del sistema (Diagrama de componentes)
+![./media/media/doc5.png](./media/doc5.png)
+## Vista de Despliegue
+Diagrama de infraestructura
+![./media/media/doc6.png](./media/doc6.png)
+Diagrama de arquitectura
+![./media/media/doc7.png](./media/doc7.png)
+
+
+
+
 ## Requisitos del Sistema
 
 Antes de instalar y ejecutar el proyecto, asegúrate de tener los siguientes requisitos:
