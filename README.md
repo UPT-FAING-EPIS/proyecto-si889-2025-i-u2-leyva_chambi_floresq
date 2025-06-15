@@ -42,7 +42,6 @@ Este proyecto permite la conversión automática de documentos en diversos forma
 ## Vista de Despliegue
 Diagrama de infraestructura
 ![./media/media/doc6.png](./media/doc6.png)
-
 Diagrama de arquitectura
 ![./media/media/doc7.png](./media/doc7.png)
 
